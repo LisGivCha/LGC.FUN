@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TaTeTi</title>
+<title>TaTeTi Pro</title>
 
 <style>
 *{box-sizing:border-box}
@@ -91,19 +91,6 @@ font-size:48px;
 border-radius:10px;
 }
 
-.cell:active{
-transform:scale(0.92);
-}
-
-/* WIN */
-#win{
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-gap:10px;
-}
-
 /* CONFETI */
 .confetti{
 position:fixed;
@@ -119,23 +106,14 @@ transform:translateY(110vh) rotate(720deg);
 opacity:0;
 }
 }
-
-/* ANIMACIÓN PANTALLA */
-.fade{
-animation:fade .3s ease;
-}
-@keyframes fade{
-from{opacity:0;transform:scale(.97)}
-to{opacity:1;transform:scale(1)}
-}
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="login" class="screen active fade">
-<h1>🎮 TaTeTi</h1>
+<div id="login" class="screen active">
+<h1>🎮 TaTeTi Pro</h1>
 
 <input id="user" placeholder="Usuario">
 <input id="pass" type="password" placeholder="Contraseña">
@@ -144,51 +122,59 @@ to{opacity:1;transform:scale(1)}
 </div>
 
 <!-- MENU -->
-<div id="menu" class="screen fade">
+<div id="menu" class="screen">
 <h1>MENÚ</h1>
 
 <div id="info"></div>
 
-<button onclick="start()">Jugar</button>
+<button onclick="start('easy')">IA Promedio</button>
+<button onclick="start('pro')">IA Profesional</button>
 <button onclick="logout()">Cerrar sesión</button>
 </div>
 
 <!-- GAME -->
-<div id="game" class="screen fade">
+<div id="game" class="screen">
+<div id="levelInfo"></div>
 <div class="grid" id="grid"></div>
 </div>
 
 <!-- WIN -->
-<div id="win" class="screen fade">
+<div id="win" class="screen">
 <h1 id="winText"></h1>
-<button onclick="restart()">Seguir jugando</button>
+<button onclick="restart()">Seguir</button>
 <button onclick="toMenu()">Salir</button>
 </div>
 
 <script>
 
-/* ===== USERS ===== */
+/* USERS */
 let users = JSON.parse(localStorage.getItem("users")||"{}");
 let currentUser=null;
 
-/* LOGIN / REGISTER (UN SOLO BOTÓN) */
+/* 🔐 LOGIN / REGISTER CORRECTO */
 function auth(){
 let u=document.getElementById("user").value;
 let p=document.getElementById("pass").value;
 
-if(!u||!p)return;
+if(!u || !p) return;
 
-/* crear si no existe */
+/* SI NO EXISTE → CREAR */
 if(!users[u]){
-users[u]={pass:p,points:0};
+users[u]={
+pass:p,
+points:0,
+xp:0,
+level:1
+};
 }
 
-/* validar */
-if(users[u].pass!==p){
+/* SI EXISTE → VALIDAR */
+if(users[u].pass !== p){
 alert("Contraseña incorrecta");
 return;
 }
 
+/* LOGIN OK */
 currentUser=u;
 save();
 show("menu");
@@ -200,10 +186,14 @@ function save(){
 localStorage.setItem("users",JSON.stringify(users));
 }
 
-/* INFO MENU */
+/* MENU INFO */
 function updateInfo(){
+let u=users[currentUser];
+
 document.getElementById("info").innerHTML=
-"👤 "+currentUser+" | 🏆 "+users[currentUser].points+" pts";
+"👤 "+currentUser+
+" | 🏆 "+u.points+
+" pts | ⭐ lvl "+u.level;
 }
 
 /* NAV */
@@ -218,13 +208,15 @@ currentUser=null;
 show("login");
 }
 
-/* ===== GAME ===== */
+/* GAME */
 let board=["","","","","","","","",""];
 let turn="X";
+let mode="easy";
 let active=true;
 
 /* START */
-function start(){
+function start(m){
+mode=m;
 reset();
 show("game");
 }
@@ -260,9 +252,74 @@ check();
 
 turn=turn=="X"?"O":"X";
 draw();
+
+/* IA */
+if(mode!=="friend" && turn==="O" && active){
+setTimeout(aiMove,300);
+}
 }
 
-/* WIN CHECK */
+/* IA EASY */
+function aiEasy(){
+let e=[];
+board.forEach((v,i)=>{if(!v)e.push(i);});
+return e[Math.floor(Math.random()*e.length)];
+}
+
+/* IA PRO (MINIMAX) */
+function aiPro(){
+let best=-999,move;
+
+for(let i=0;i<9;i++){
+if(board[i]==""){
+board[i]="O";
+let s=minimax(false);
+board[i]="";
+if(s>best){best=s;move=i;}
+}
+}
+return move;
+}
+
+function minimax(max){
+let w=winner();
+if(w==="O")return 10;
+if(w==="X")return -10;
+if(!board.includes(""))return 0;
+
+if(max){
+let best=-999;
+for(let i=0;i<9;i++){
+if(board[i]==""){
+board[i]="O";
+best=Math.max(best,minimax(false));
+board[i]="";
+}
+}
+return best;
+}else{
+let best=999;
+for(let i=0;i<9;i++){
+if(board[i]==""){
+board[i]="X";
+best=Math.min(best,minimax(true));
+board[i]="";
+}
+}
+return best;
+}
+}
+
+/* IA MOVE */
+function aiMove(){
+let move = mode==="easy" ? aiEasy() : aiPro();
+board[move]="O";
+check();
+turn="X";
+draw();
+}
+
+/* WIN */
 function winner(){
 let w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 for(let x of w){
@@ -273,6 +330,19 @@ return board[a];
 return null;
 }
 
+/* XP + LEVEL + POINTS */
+function addStats(w){
+let u=users[currentUser];
+
+if(w==="X") u.xp+=10;
+if(w==="O") u.xp+=20;
+
+u.level = Math.floor(u.xp/50)+1;
+u.points += (w==="X") ? 10 : 20;
+
+save();
+}
+
 /* CHECK */
 function check(){
 let w=winner();
@@ -280,20 +350,15 @@ let w=winner();
 if(w){
 active=false;
 
-/* puntos */
-if(currentUser){
-users[currentUser].points += (w==="X") ? 10 : 20;
-save();
-updateInfo();
-}
+if(currentUser) addStats(w);
 
 confetti();
 show("win");
 winText.innerText="Ganó "+w;
+updateInfo();
 return;
 }
 
-/* empate */
 if(!board.includes("")){
 active=false;
 show("win");
