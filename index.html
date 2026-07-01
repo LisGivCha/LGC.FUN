@@ -2,13 +2,20 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Tatetí</title>
+<title>Tatetí Local</title>
 
 <style>
 body {
   font-family: Arial;
   text-align: center;
   margin-top: 40px;
+}
+
+h1 { margin-bottom: 10px; }
+
+#turn {
+  font-size: 18px;
+  margin-bottom: 20px;
 }
 
 #board {
@@ -21,14 +28,20 @@ body {
 .cell {
   width: 100px;
   height: 100px;
-  font-size: 40px;
+  font-size: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid black;
   cursor: pointer;
+  user-select: none;
 }
 
+.cell:hover {
+  background: #f0f0f0;
+}
+
+/* pantalla de victoria */
 #winScreen {
   position: fixed;
   top: 0;
@@ -48,12 +61,11 @@ body {
   margin-bottom: 20px;
 }
 
-#backBtn {
-  font-size: 30px;
+#restartBtn {
+  font-size: 22px;
   padding: 10px 20px;
   cursor: pointer;
   border: none;
-  background: white;
   border-radius: 10px;
 }
 </style>
@@ -62,12 +74,13 @@ body {
 <body>
 
 <h1>Tatetí (3 en raya)</h1>
+<div id="turn">Turno: X</div>
 
 <div id="board"></div>
 
 <div id="winScreen">
   <div id="winText"></div>
-  <button id="backBtn">⬅ Salir / Reiniciar</button>
+  <button id="restartBtn">⬅ Reiniciar</button>
 </div>
 
 <script>
@@ -78,7 +91,8 @@ let gameOver = false;
 const boardDiv = document.getElementById("board");
 const winScreen = document.getElementById("winScreen");
 const winText = document.getElementById("winText");
-const backBtn = document.getElementById("backBtn");
+const restartBtn = document.getElementById("restartBtn");
+const turnText = document.getElementById("turn");
 
 function drawBoard() {
   boardDiv.innerHTML = "";
@@ -92,6 +106,8 @@ function drawBoard() {
 
     boardDiv.appendChild(div);
   });
+
+  turnText.textContent = gameOver ? "" : "Turno: " + turn;
 }
 
 function play(i) {
@@ -102,17 +118,23 @@ function play(i) {
   if (checkWin(turn)) {
     showWin(turn);
     gameOver = true;
-  } else {
-    turn = turn === "X" ? "O" : "X";
+    return;
   }
 
+  if (board.every(c => c !== null)) {
+    showWin("Empate");
+    gameOver = true;
+    return;
+  }
+
+  turn = turn === "X" ? "O" : "X";
   drawBoard();
 }
 
 function checkWin(p) {
   const wins = [
     [0,1,2],[3,4,5],[6,7,8],
-    [0,3,6],[1,6,7],[2,5,8],
+    [0,3,6],[1,4,7],[2,5,8],
     [0,4,8],[2,4,6]
   ];
 
@@ -122,11 +144,16 @@ function checkWin(p) {
 }
 
 function showWin(player) {
-  winText.textContent = "Victoria de " + player;
   winScreen.style.display = "flex";
+
+  if (player === "Empate") {
+    winText.textContent = "Empate 🤝";
+  } else {
+    winText.textContent = "Victoria de " + player + " 🎉";
+  }
 }
 
-backBtn.onclick = () => {
+restartBtn.onclick = () => {
   board = Array(9).fill(null);
   turn = "X";
   gameOver = false;
