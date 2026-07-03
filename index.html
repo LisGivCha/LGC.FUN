@@ -27,6 +27,9 @@
 .logro.titulo { color: #00f7ff; font-weight: bold; font-size: 15px; }
 .novedad { background: #111; border-left: 3px solid #00f7ff; padding: 12px; margin: 10px 0; text-align: left; border-radius: 6px; }
 .version { color: #00f7ff; font-size: 22px; margin-bottom: 10px; }
+.quePasaria { font-size: 20px; color: #00f7ff; margin: 20px 0; min-height: 80px; display: flex; align-items: center; justify-content: center; padding: 10px; }
+.btnGrande { background: #00f7ff; color: #000; border: none; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+.btnGrande:hover { box-shadow: 0 0 20px #00f7ff; }
 </style>
 </head>
 <body>
@@ -47,24 +50,22 @@
 <div class="container">
   <div id="menu" class="card">
     <h2>Bienvenido a LGC.FUN</h2>
-    <p>Versión 1.1</p>
+    <p>Versión 1.2</p>
   </div>
 
   <div id="novedades" class="card" style="display:none">
     <h2>📢 Novedades</h2>
-    <div class="version">Novedades V1.1</div>
-
-    <div class="novedad">✨ Agregada sección Perfil con Logros</div>
-    <div class="novedad">📱 Exp 2 "Dibuja un circulo" ahora funciona en celu</div>
-    <div class="novedad">💾 Los puntajes se guardan automáticamente</div>
-    <div class="novedad">⚡ Menú cambiado: Info -> Novedades</div>
-
+    <div class="version">Novedades V1.2</div>
+    <div class="novedad">🌀 Exp 3: ¿Qué pasaría si...? con escenarios nuevos</div>
+    <div class="novedad">⭕ Exp 2: Ahora tenés que cerrar el círculo</div>
+    <div class="novedad">🧹 Auto-borrar al empezar un nuevo dibujo</div>
   </div>
 
   <div id="lab" class="card" style="display:none">
     <h2>Laboratorio</h2>
     <button class="lab-btn" onclick="showExp(1)">Click por segundo</button>
     <button class="lab-btn" onclick="showExp(2)">Dibuja un circulo perfecto</button>
+    <button class="lab-btn" onclick="showExp(3)">¿Qué pasaría si...?</button>
 
     <div id="exp1" style="display:none; margin-top:20px;">
       <h3>Exp 1: Click por segundo</h3>
@@ -81,10 +82,16 @@
 
     <div id="exp2" style="display:none; margin-top:20px;">
       <h3>Exp 2: Dibuja un circulo perfecto</h3>
-      <p>Toca y arrastra con el dedo</p>
+      <p>Empezá y terminá cerca del punto inicial</p>
       <canvas id="canvasDraw"></canvas>
       <h3 id="circleScore">Precisión: -</h3>
-      <button class="time-btn" onclick="clearCanvas()">Borrar</button>
+    </div>
+
+    <div id="exp3" style="display:none; margin-top:20px;">
+      <h3>Exp 3: ¿Qué pasaría si...?</h3>
+      <p>Toca el botón para generar un escenario random</p>
+      <div class="quePasaria" id="escenario">¿Qué pasaría si...?</div>
+      <button class="btnGrande" onclick="generarEscenario()">Generar</button>
     </div>
   </div>
 
@@ -93,6 +100,7 @@
     <p id="perfilUser">Jugador Anónimo</p>
     <p>Mejor CPS: <b id="bestCPS">0</b></p>
     <p>Mejor Círculo: <b id="bestCircle">0</b>%</p>
+    <p>Escenarios vistos: <b id="escenariosVistos">0</b></p>
     <div class="divider"></div>
     <h3>Logros</h3>
     <div id="logrosList">Cargando...</div>
@@ -127,7 +135,7 @@ drawStars();
 
 // DATOS
 let currentUser = localStorage.getItem('lgc_user') || 'anonimo';
-let data = JSON.parse(localStorage.getItem('lgc_data_' + currentUser)) || {bestCPS:0, bestCircle:0, logros:[]};
+let data = JSON.parse(localStorage.getItem('lgc_data_' + currentUser)) || {bestCPS:0, bestCircle:0, escenarios:0, logros:[]};
 
 // Navegación
 function show(id){
@@ -140,6 +148,7 @@ function show(id){
 function showExp(n){
   document.getElementById('exp1').style.display = n==1? 'block' : 'none';
   document.getElementById('exp2').style.display = n==2? 'block' : 'none';
+  document.getElementById('exp3').style.display = n==3? 'block' : 'none';
 }
 
 // EXP 1: Click
@@ -170,21 +179,59 @@ function startGame(){
 }
 function count(){ if(playing){ clicks++; document.getElementById('score').innerText = 'Puntaje: ' + clicks; }}
 
-// EXP 2: Dibujar circulo
+// EXP 2: Dibujar circulo - NUEVO SISTEMA
 const drawCanvas = document.getElementById('canvasDraw');
 const dctx = drawCanvas.getContext('2d');
-let drawing = false; let points = [];
+let drawing = false; let points = []; let startPoint = null;
+
 function getPos(e){
   const rect = drawCanvas.getBoundingClientRect();
   let x = e.clientX || e.touches[0].clientX;
   let y = e.clientY || e.touches[0].clientY;
   return {x: x - rect.left, y: y - rect.top};
 }
-function startDraw(e){ e.preventDefault(); drawing = true; points = []; }
-function moveDraw(e){ if(!drawing) return; e.preventDefault(); const pos = getPos(e); points.push(pos); dctx.fillStyle = '#00f7ff'; dctx.beginPath(); dctx.arc(pos.x,pos.y,3,0,Math.PI*2); dctx.fill(); }
+
+function startDraw(e){
+  e.preventDefault();
+  clearCanvas(); // Auto-borrar al empezar
+  drawing = true;
+  points = [];
+  startPoint = getPos(e);
+  points.push(startPoint);
+}
+
+function moveDraw(e){
+  if(!drawing) return;
+  e.preventDefault();
+  const pos = getPos(e);
+  points.push(pos);
+  dctx.strokeStyle = '#00f7ff';
+  dctx.lineWidth = 3;
+  dctx.beginPath();
+  dctx.moveTo(points[points.length-2].x, points[points.length-2].y);
+  dctx.lineTo(pos.x, pos.y);
+  dctx.stroke();
+}
+
 function endDraw(){
+  if(!drawing) return;
   drawing = false;
-  if(points.length < 10) return;
+
+  if(points.length < 20){
+    document.getElementById('circleScore').innerText = '¡TE FALTO COMPLETAR EL CIRCULO!';
+    return;
+  }
+
+  // Verificar si cerró el círculo
+  let endPoint = points[points.length-1];
+  let dist = Math.hypot(endPoint.x - startPoint.x, endPoint.y - startPoint.y);
+
+  if(dist > 40){
+    document.getElementById('circleScore').innerText = '¡TE FALTO COMPLETAR EL CIRCULO!';
+    return;
+  }
+
+  // Calcular precisión
   let cx = points.reduce((a,p)=>a+p.x,0)/points.length;
   let cy = points.reduce((a,p)=>a+p.y,0)/points.length;
   let avgR = points.reduce((a,p)=>a+Math.hypot(p.x-cx,p.y-cy),0)/points.length;
@@ -193,9 +240,33 @@ function endDraw(){
   document.getElementById('circleScore').innerText = 'Precisión: ' + score.toFixed(0) + '%';
   if(score > data.bestCircle){ data.bestCircle = score; checkLogros(); saveData(); }
 }
+
 drawCanvas.onmousedown = startDraw; drawCanvas.onmousemove = moveDraw; drawCanvas.onmouseup = endDraw;
 drawCanvas.ontouchstart = startDraw; drawCanvas.ontouchmove = moveDraw; drawCanvas.ontouchend = endDraw;
-function clearCanvas(){ dctx.clearRect(0,0,drawCanvas.width,drawCanvas.height); document.getElementById('circleScore').innerText = 'Precisión: -'; }
+
+function clearCanvas(){
+  dctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+  document.getElementById('circleScore').innerText = 'Precisión: -';
+}
+
+// EXP 3: ¿Qué pasaría si...?
+const escenarios = [
+  "los gatos dominaran el mundo?",
+  "en el sistema solar hubieran 2 soles?",
+  "tuvieramos 2 lunas?",
+  "pudieras respirar bajo el agua?",
+  "el tiempo fuera dinero?",
+  "los dinosaurios nunca se extinguieron?",
+  "pudieras teletransportarte?",
+  "la gravedad fuera la mitad?"
+];
+function generarEscenario(){
+  const random = escenarios[Math.floor(Math.random()*escenarios.length)];
+  document.getElementById('escenario').innerText = "¿Qué pasaría si " + random;
+  data.escenarios++;
+  checkLogros();
+  saveData();
+}
 
 // LOGROS
 const logrosData = [
@@ -204,6 +275,8 @@ const logrosData = [
   {id:'cps_9', titulo:'Ametralladora', desc:'Llega a 9 CPS'},
   {id:'circle_80', titulo:'Artista', desc:'80% de precisión en círculo'},
   {id:'circle_95', titulo:'Compás Humano', desc:'95% de precisión en círculo'},
+  {id:'esc_1', titulo:'Curioso', desc:'Genera tu primer escenario'},
+  {id:'esc_10', titulo:'Multiverso', desc:'Genera 10 escenarios diferentes'},
 ];
 function checkLogros(){
   logrosData.forEach(l=>{
@@ -213,6 +286,8 @@ function checkLogros(){
     if(l.id=='cps_9' && data.bestCPS>=9) unlocked=true;
     if(l.id=='circle_80' && data.bestCircle>=80) unlocked=true;
     if(l.id=='circle_95' && data.bestCircle>=95) unlocked=true;
+    if(l.id=='esc_1' && data.escenarios>=1) unlocked=true;
+    if(l.id=='esc_10' && data.escenarios>=10) unlocked=true;
     if(unlocked &&!data.logros.includes(l.id)){
       data.logros.push(l.id);
       alert('🏆 Logro desbloqueado: ' + l.titulo);
@@ -223,6 +298,7 @@ function updatePerfil(){
   document.getElementById('perfilUser').innerText = currentUser=='anonimo'? 'Jugador Anónimo' : 'Usuario: ' + currentUser;
   document.getElementById('bestCPS').innerText = data.bestCPS.toFixed(2);
   document.getElementById('bestCircle').innerText = data.bestCircle.toFixed(0);
+  document.getElementById('escenariosVistos').innerText = data.escenarios;
   let html = '';
   logrosData.forEach(l=>{
     let unlocked = data.logros.includes(l.id);
@@ -240,7 +316,7 @@ function login(){
   if(u){
     currentUser = u;
     localStorage.setItem('lgc_user', u);
-    data = JSON.parse(localStorage.getItem('lgc_data_' + u)) || {bestCPS:0, bestCircle:0, logros:[]};
+    data = JSON.parse(localStorage.getItem('lgc_data_' + u)) || {bestCPS:0, bestCircle:0, escenarios:0, logros:[]};
     document.getElementById('msg').innerText = 'Bienvenido ' + u;
     updatePerfil();
   }
@@ -248,7 +324,7 @@ function login(){
 function logout(){
   currentUser = 'anonimo';
   localStorage.removeItem('lgc_user');
-  data = JSON.parse(localStorage.getItem('lgc_data_anonimo')) || {bestCPS:0, bestCircle:0, logros:[]};
+  data = JSON.parse(localStorage.getItem('lgc_data_anonimo')) || {bestCPS:0, bestCircle:0, escenarios:0, logros:[]};
   document.getElementById('msg').innerText = 'Modo Anónimo';
 }
 function saveData(){
@@ -259,4 +335,4 @@ updatePerfil();
 </script>
 
 </body>
-     </html>
+       </html>
