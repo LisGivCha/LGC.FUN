@@ -6,7 +6,7 @@
 <title>LGC.FUN</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-  
+
   body { background: #000; color: #fff; overflow-x: hidden; }
 
   #stars { position: fixed; width: 100%; height: 100%; z-index: -1; }
@@ -16,41 +16,47 @@
 
   nav button {
     background: #111; border: 1px solid #00f7ff; color: #00f7ff;
-    padding: 10px 20px; margin: 10px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+    padding: 10px 15px; margin: 5px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 14px;
   }
   nav button:hover { background: #00f7ff; color: #000; box-shadow: 0 0 15px #00f7ff; }
 
-  .container { padding: 30px; text-align: center; }
-  .card {
+ .container { padding: 20px; text-align: center; }
+ .card {
     background: rgba(17,17,17,0.8); border: 1px solid #333; padding: 25px;
     border-radius: 12px; margin: 20px auto; max-width: 600px; backdrop-filter: blur(10px);
   }
 
-  .divider { border-top: 1px solid #333; margin: 15px 0; }
+ .divider { border-top: 1px solid #333; margin: 15px 0; }
 
-  .lab-btn {
+ .lab-btn {
     background: #222; border: 1px solid #00f7ff; color: #00f7ff;
-    padding: 15px; margin: 10px; border-radius: 10px; cursor: pointer; 
+    padding: 15px; margin: 10px; border-radius: 10px; cursor: pointer;
     width: 90%; font-size: 16px; transition: 0.2s;
   }
-  .lab-btn:hover { background: #00f7ff; color: #000; transform: scale(1.02); }
+ .lab-btn:hover { background: #00f7ff; color: #000; transform: scale(1.02); }
 
-  .time-btn {
+ .time-btn {
     background: #222; border: 1px solid #555; color: #fff; padding: 8px 15px;
     margin: 5px; border-radius: 6px; cursor: pointer;
   }
-  .time-btn.active { background: #00f7ff; color: #000; border-color: #00f7ff; }
+ .time-btn.active { background: #00f7ff; color: #000; border-color: #00f7ff; }
 
   #gameArea {
     width: 100%; height: 200px; background: rgba(0,247,255,0.05);
     border: 2px dashed #00f7ff; border-radius: 20px; display: flex;
     align-items: center; justify-content: center; font-size: 24px;
-    margin-top: 15px; cursor: pointer; user-select: none; transition: 0.1s;
+    margin-top: 15px; cursor: pointer; user-select: none; transition: 0.1s; touch-action: none;
   }
   #gameArea:active { transform: scale(0.95); background: rgba(0,247,255,0.2); }
 
-  #canvasDraw { background: #111; border: 2px solid #00f7ff; border-radius: 12px; cursor: crosshair; width: 100%; max-width: 400px; height: 200px; }
-  input { padding: 10px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; margin: 5px; }
+  #canvasDraw { background: #111; border: 2px solid #00f7ff; border-radius: 12px; cursor: crosshair; width: 100%; max-width: 400px; height: 200px; touch-action: none; }
+  input { padding: 10px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; margin: 5px; width: 80%; }
+
+ .logro {
+    background: #111; border: 1px solid #444; padding: 10px; margin: 8px; border-radius: 8px; text-align: left;
+  }
+ .logro.unlocked { border-color: #00f7ff; background: rgba(0,247,255,0.1); }
+ .logro.titulo { color: #00f7ff; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -62,8 +68,8 @@
   <nav>
     <button onclick="show('menu')">Menu</button>
     <button onclick="show('info')">Info</button>
-    <div class="divider"></div>
     <button onclick="show('lab')">Laboratorio</button>
+    <button onclick="show('perfil')">Perfil</button>
     <button onclick="show('login')">Login</button>
   </nav>
 </header>
@@ -71,19 +77,16 @@
 <div class="container">
   <div id="menu" class="card">
     <h2>Bienvenido</h2>
-    <p>Elegi una sección de arriba para empezar</p>
+    <p>Hace login para guardar puntajes y logros</p>
   </div>
 
   <div id="info" class="card" style="display:none">
     <h2>Info</h2>
-    <p>Somos LGC. Laboratorio de juegos y experimentos random.</p>
-    <p>Guardamos puntajes cuando hagas login.</p>
+    <p>Laboratorio de experimentos LGC</p>
   </div>
 
   <div id="lab" class="card" style="display:none">
     <h2>Laboratorio</h2>
-    <p>Elegi un experimento:</p>
-    
     <button class="lab-btn" onclick="showExp(1)">Click por segundo</button>
     <button class="lab-btn" onclick="showExp(2)">Dibuja un circulo perfecto</button>
 
@@ -97,16 +100,26 @@
       </div>
       <h3 id="score">Puntaje: 0</h3>
       <h3 id="timer">Tiempo: 5s</h3>
-      <div id="gameArea" onclick="handleClick()">Click para empezar</div>
+      <div id="gameArea">Click para empezar</div>
     </div>
 
     <div id="exp2" style="display:none; margin-top:20px;">
       <h3>Exp 2: Dibuja un circulo perfecto</h3>
-      <p>Hace click y arrastra. Solta para calificar</p>
+      <p>Toca y arrastra con el dedo</p>
       <canvas id="canvasDraw"></canvas>
       <h3 id="circleScore">Precisión: -</h3>
       <button class="time-btn" onclick="clearCanvas()">Borrar</button>
     </div>
+  </div>
+
+  <div id="perfil" class="card" style="display:none">
+    <h2>Perfil</h2>
+    <p id="perfilUser">No logueado</p>
+    <p>Mejor CPS: <span id="bestCPS">0</span></p>
+    <p>Mejor Círculo: <span id="bestCircle">0</span>%</p>
+    <div class="divider"></div>
+    <h3>Logros</h3>
+    <div id="logrosList"></div>
   </div>
 
   <div id="login" class="card" style="display:none">
@@ -114,6 +127,7 @@
     <input type="text" id="user" placeholder="Usuario">
     <input type="password" id="pass" placeholder="Contraseña">
     <button class="time-btn" onclick="login()">Entrar</button>
+    <button class="time-btn" onclick="logout()">Salir</button>
     <p id="msg"></p>
   </div>
 </div>
@@ -135,59 +149,71 @@ function drawStars(){
 }
 drawStars();
 
-// Navegación principal
+// Datos
+let currentUser = localStorage.getItem('lgc_user') || null;
+let data = JSON.parse(localStorage.getItem('lgc_data_' + currentUser)) || {bestCPS:0, bestCircle:0, logros:[]};
+
+// Navegación
 function show(id){
   document.querySelectorAll('.card').forEach(c=>c.style.display='none');
   document.getElementById(id).style.display='block';
+  if(id=='perfil') updatePerfil();
 }
 
-// Navegación de experimentos
+// Experimentos
 function showExp(n){
-  document.getElementById('exp1').style.display = n==1 ? 'block' : 'none';
-  document.getElementById('exp2').style.display = n==2 ? 'block' : 'none';
+  document.getElementById('exp1').style.display = n==1? 'block' : 'none';
+  document.getElementById('exp2').style.display = n==2? 'block' : 'none';
 }
 
 // EXP 1: Click
 let clicks = 0; let playing = false; let gameTime = 5; let timeLeft = 5; let timerInterval;
+const gameArea = document.getElementById('gameArea');
 function setTime(t, e){
   gameTime = t; timeLeft = t;
   document.getElementById('timer').innerText = 'Tiempo: ' + t + 's';
-  document.querySelectorAll('#exp1 .time-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#exp1.time-btn').forEach(b=>b.classList.remove('active'));
   e.target.classList.add('active');
 }
-function handleClick(){
-  if(!playing) startGame();
-  else count();
-}
+gameArea.onclick = gameArea.ontouchstart = (e)=>{ e.preventDefault(); if(!playing) startGame(); else count(); }
 function startGame(){
   clicks = 0; timeLeft = gameTime; playing = true;
   document.getElementById('score').innerText = 'Puntaje: 0';
-  document.getElementById('gameArea').innerText = '¡CLICK!';
+  gameArea.innerText = '¡CLICK!';
   timerInterval = setInterval(()=>{
     timeLeft--;
     document.getElementById('timer').innerText = 'Tiempo: ' + timeLeft + 's';
     if(timeLeft <= 0){
       clearInterval(timerInterval); playing = false;
-      document.getElementById('gameArea').innerText = 'Click para empezar';
-      alert('Terminaste! Puntaje: ' + clicks + ' | CPS: ' + (clicks/gameTime).toFixed(2));
+      gameArea.innerText = 'Click para empezar';
+      let cps = clicks/gameTime;
+      alert('Terminaste! Puntaje: ' + clicks + ' | CPS: ' + cps.toFixed(2));
+      if(cps > data.bestCPS){ data.bestCPS = cps; checkLogros('cps', cps); saveData(); }
     }
   }, 1000);
 }
 function count(){ if(playing){ clicks++; document.getElementById('score').innerText = 'Puntaje: ' + clicks; }}
 
-// EXP 2: Dibujar circulo
+// EXP 2: Dibujar circulo - AHORA CON TOUCH
 const drawCanvas = document.getElementById('canvasDraw');
 const dctx = drawCanvas.getContext('2d');
 let drawing = false; let points = [];
-drawCanvas.onmousedown = (e)=>{ drawing = true; points = []; };
-drawCanvas.onmousemove = (e)=>{
-  if(!drawing) return;
+
+function getPos(e){
   const rect = drawCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-  points.push({x,y});
-  dctx.fillStyle = '#00f7ff'; dctx.beginPath(); dctx.arc(x,y,2,0,Math.PI*2); dctx.fill();
-};
-drawCanvas.onmouseup = ()=>{
+  let x = e.clientX || e.touches[0].clientX;
+  let y = e.clientY || e.touches[0].clientY;
+  return {x: x - rect.left, y: y - rect.top};
+}
+
+function startDraw(e){ e.preventDefault(); drawing = true; points = []; }
+function moveDraw(e){
+  if(!drawing) return; e.preventDefault();
+  const pos = getPos(e);
+  points.push(pos);
+  dctx.fillStyle = '#00f7ff'; dctx.beginPath(); dctx.arc(pos.x,pos.y,3,0,Math.PI*2); dctx.fill();
+}
+function endDraw(){
   drawing = false;
   if(points.length < 10) return;
   let cx = points.reduce((a,p)=>a+p.x,0)/points.length;
@@ -196,18 +222,73 @@ drawCanvas.onmouseup = ()=>{
   let variance = points.reduce((a,p)=>a+Math.abs(Math.hypot(p.x-cx,p.y-cy)-avgR),0)/points.length;
   let score = Math.max(0, 100 - (variance/avgR)*100);
   document.getElementById('circleScore').innerText = 'Precisión: ' + score.toFixed(0) + '%';
-};
+  if(score > data.bestCircle){ data.bestCircle = score; checkLogros('circle', score); saveData(); }
+}
+
+drawCanvas.onmousedown = startDraw;
+drawCanvas.onmousemove = moveDraw;
+drawCanvas.onmouseup = endDraw;
+drawCanvas.ontouchstart = startDraw;
+drawCanvas.ontouchmove = moveDraw;
+drawCanvas.ontouchend = endDraw;
+
 function clearCanvas(){ dctx.clearRect(0,0,drawCanvas.width,drawCanvas.height); document.getElementById('circleScore').innerText = 'Precisión: -'; }
 
-// Login
+// LOGROS
+const logrosData = [
+  {id:'first_click', titulo:'Primer Click', desc:'Hace tu primer click', check:(d)=>d.bestCPS>0},
+  {id:'cps_5', titulo:'Dedos Rápidos', desc:'Llega a 5 CPS', check:(d)=>d.bestCPS>=5},
+  {id:'cps_9', titulo:'Ametralladora', desc:'Llega a 9 CPS', check:(d)=>d.bestCPS>=9},
+  {id:'circle_80', titulo:'Artista', desc:'80% de precisión en círculo', check:(d)=>d.bestCircle>=80},
+  {id:'circle_95', titulo:'Compás Humano', desc:'95% de precisión en círculo', check:(d)=>d.bestCircle>=95},
+];
+
+function checkLogros(type, value){
+  logrosData.forEach(l=>{
+    if(!data.logros.includes(l.id) && l.check(data)){
+      data.logros.push(l.id);
+      alert('🏆 Logro desbloqueado: ' + l.titulo);
+    }
+  });
+}
+
+function updatePerfil(){
+  document.getElementById('perfilUser').innerText = currentUser? 'Usuario: ' + currentUser : 'No logueado';
+  document.getElementById('bestCPS').innerText = data.bestCPS.toFixed(2);
+  document.getElementById('bestCircle').innerText = data.bestCircle.toFixed(0);
+  let html = '';
+  logrosData.forEach(l=>{
+    let unlocked = data.logros.includes(l.id);
+    html += `<div class="logro ${unlocked?'unlocked':''}">
+      <div class="titulo">${unlocked?'🏆':''} ${l.titulo}</div>
+      <div>${l.desc}</div>
+    </div>`;
+  });
+  document.getElementById('logrosList').innerHTML = html;
+}
+
+// LOGIN
 function login(){
   const u = document.getElementById('user').value;
-  if(u) document.getElementById('msg').innerText = 'Bienvenido ' + u;
-  else document.getElementById('msg').innerText = 'Ingresa usuario';
+  if(u){
+    currentUser = u;
+    localStorage.setItem('lgc_user', u);
+    data = JSON.parse(localStorage.getItem('lgc_data_' + u)) || {bestCPS:0, bestCircle:0, logros:[]};
+    document.getElementById('msg').innerText = 'Bienvenido ' + u;
+  }
+}
+function logout(){
+  currentUser = null;
+  localStorage.removeItem('lgc_user');
+  data = {bestCPS:0, bestCircle:0, logros:[]};
+  document.getElementById('msg').innerText = 'Sesión cerrada';
+}
+function saveData(){
+  if(currentUser) localStorage.setItem('lgc_data_' + currentUser, JSON.stringify(data));
 }
 
 window.onresize = ()=>{ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 </script>
 
 </body>
-         </html>
+     </html>
