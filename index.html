@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LGC.FUN v1.3.6</title>
+<title>LGC.FUN v1.3.8</title>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-  body { background: #000; color: #fff; overflow-x: hidden; overflow-y: auto; height: 100vh; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { background: #000; color: #fff; overflow-x: hidden; overflow-y: auto; height: 100vh; user-select: none; }
   #stars { position: fixed; width: 100%; height: 100%; z-index: -1; }
   header { padding: 20px; text-align: center; border-bottom: 1px solid #222; }
   header h1 { color: #00f7ff; text-shadow: 0 0 10px #00f7ff; font-size: 32px; }
@@ -18,9 +18,13 @@
 .divider { border-top: 1px solid #333; margin: 15px 0; }
 .lab-btn { background: #222; border: 1px solid #00f7ff; color: #00f7ff; padding: 15px; margin: 10px; border-radius: 10px; cursor: pointer; width: 90%; font-size: 16px; }
 .lab-btn:hover { background: #00f7ff; color: #000; }
-.time-btn { background: #222; border: 1px solid #555; color: #fff; padding: 8px 15px; margin: 5px; border-radius: 6px; cursor: pointer; }
-.time-btn.active { background: #00f7ff; color: #000; }
-  #gameArea { width: 100%; height: 200px; background: rgba(0,247,255,0.05); border: 2px dashed #00f7ff; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: 15px; cursor: pointer; touch-action: none; }
+.time-btn { background: #222; border: 1px solid #555; color: #fff; padding: 8px 15px; margin: 5px; border-radius: 6px; cursor: pointer; outline: none; }
+.time-btn.active { background: #00f7ff; color: #000; border-color: #00f7ff; }
+.time-btn:focus { outline: none; }
+.esc-btn { background: #111; border: 1px solid #444; color: #fff; padding: 12px; margin: 6px; border-radius: 8px; cursor: pointer; width: 100%; text-align: left; font-size: 15px; transition: 0.2s; }
+.esc-btn:hover { border-color: #00f7ff; background: rgba(0,247,255,0.05); }
+  #gameArea { width: 100%; height: 200px; background: rgba(0,247,255,0.05); border: 2px dashed #00f7ff; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: 15px; cursor: pointer; touch-action: none; user-select: none; }
+  #gameArea:active { background: rgba(0,247,255,0.1); }
   #canvasDraw { background: #111; border: 2px solid #00f7ff; border-radius: 12px; width: 100%; max-width: 400px; height: 200px; touch-action: none; }
   input { padding: 10px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; margin: 5px; width: 80%; }
 .logro { background: #111; border: 1px solid #444; padding: 12px; margin: 8px 0; border-radius: 8px; text-align: left; }
@@ -29,7 +33,7 @@
 .novedad { background: #111; border-left: 3px solid #00f7ff; padding: 12px; margin: 10px 0; text-align: left; border-radius: 6px; }
 .version { color: #00f7ff; font-size: 22px; margin-bottom: 10px; }
 .quePasaria { font-size: 20px; color: #00f7ff; margin: 20px 0 10px 0; min-height: 60px; display: flex; align-items: center; justify-content: center; padding: 10px; }
-.respuesta { font-size: 15px; color: #aaa; margin-bottom: 15px; padding: 10px; background: rgba(0,247,255,0.05); border-radius: 8px; min-height: 40px; }
+.respuesta { font-size: 15px; color: #aaa; margin-bottom: 15px; padding: 15px; background: rgba(0,247,255,0.05); border-radius: 8px; min-height: 80px; text-align: left; line-height: 1.5; }
 .btnGrande { background: #00f7ff; color: #000; border: none; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 #ball { width: 30px; height: 30px; background: #00f7ff; border-radius: 50%; position: absolute; box-shadow: 0 0 15px #00f7ff; }
 #gravedadArea { width: 100%; height: 250px; background: rgba(0,247,255,0.03); border: 2px dashed #00f7ff; border-radius: 12px; position: relative; overflow: hidden; margin-top: 15px; }
@@ -57,27 +61,21 @@
 <div class="container">
   <div id="menu" class="card active">
     <h2>Bienvenido a LGC.FUN</h2>
-    <p>Versión 1.3.6</p>
+    <p>Versión 1.3.8</p>
   </div>
 
   <div id="novedades" class="card">
     <h2>📢 Novedades</h2>
-    <div class="version">Novedades V1.3.6</div>
-    <div class="novedad">⏱️ Nuevos tiempos: 1s, 2s, 5s, 10s, 20s en CPS</div>
-    <div class="novedad">📖 Respuestas de "¿Qué pasaría si?" ahora son más largas</div>
+    <div class="version">Novedades V1.3.8</div>
+    <div class="novedad">📋 Escenarios ahora tienen botones para elegir</div>
+    <div class="novedad">🖱️ Fix: Ya no se pone azul al clickear CPS</div>
   </div>
 
   <div id="periodico" class="card">
     <h2>📰 Periódico LGC</h2>
     <div class="historial">
-      <h4>V1.3.6</h4>
-      <p>- 5 contadores en CPS: 1, 2, 5, 10, 20 seg</p>
-      <p>- Escenarios con respuestas extendidas</p>
-    </div>
-    <div class="historial">
-      <h4>V1.3.5</h4>
-      <p>- Auto limpiar circulo</p>
-      <p>- Sistema de Logros</p>
+      <h4>V1.3.8</h4>
+      <p>- Exp 3: Lista de escenarios clickeables</p>
     </div>
   </div>
 
@@ -102,16 +100,16 @@
 
     <div id="exp2" style="display:none; margin-top:20px;">
       <h3>Exp 2: Dibuja un circulo perfecto</h3>
-      <p>Empezá y terminá cerca. Se limpia solo</p>
       <canvas id="canvasDraw"></canvas>
       <h3 id="circleScore">Precisión: -</h3>
     </div>
 
     <div id="exp3" style="display:none; margin-top:20px;">
       <h3>Exp 3: ¿Qué pasaría si...?</h3>
-      <div class="quePasaria" id="escenario">¿Qué pasaría si...?</div>
-      <div class="respuesta" id="respuesta"></div>
-      <button class="btnGrande" onclick="generarEscenario()">Generar</button>
+      <p style="color:#aaa; margin-bottom:15px;">Toca un escenario para ver la respuesta</p>
+      <div id="listaEscenarios"></div>
+      <div class="quePasaria" id="escenario">Selecciona un escenario</div>
+      <div class="respuesta" id="respuesta">Aquí aparecerá la respuesta...</div>
     </div>
 
     <div id="exp4" style="display:none; margin-top:20px;">
@@ -158,22 +156,25 @@ function show(id){
   document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(id=='perfil') updatePerfil();
+  if(id=='lab' && document.getElementById('exp3').style.display=='block') cargarEscenarios(); // carga botones
 }
 function showExp(n){
   document.getElementById('exp1').style.display = n==1?'block':'none';
   document.getElementById('exp2').style.display = n==2?'block':'none';
   document.getElementById('exp3').style.display = n==3?'block':'none';
   document.getElementById('exp4').style.display = n==4?'block':'none';
+  if(n==3) cargarEscenarios();
 }
 
-// EXP 1: CLICK - AHORA 1,2,5,10,20
+// EXP 1: CLICK
 let clicks=0, playing=false, time=5;
-document.getElementById('gameArea').onclick = ()=>{ if(!playing) start(); else {clicks++; document.getElementById('score').innerText='Puntaje: '+clicks;} }
+document.getElementById('gameArea').onclick = (e)=>{ e.preventDefault(); if(!playing) start(); else {clicks++; document.getElementById('score').innerText='Puntaje: '+clicks;} }
 function setTime(t, e){
   time=t;
   document.getElementById('timer').innerText='Tiempo: '+t+'s';
   document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active'));
   e.target.classList.add('active');
+  e.target.blur();
 }
 function start(){
   clicks=0; playing=true; let t=time;
@@ -246,7 +247,7 @@ function clearCanvas(){
     document.getElementById('circleScore').innerText = 'Precisión: -';
 }
 
-// EXP 3: RESPUESTAS MAS LARGAS
+// EXP 3: BOTONES DE ESCENARIOS
 const esc = [
   {p:"hubieran 2 soles?",r:"Tendríamos días de 48 horas de luz seguidos y noches eternas. El clima sería un caos: desiertos hirviendo y zonas congeladas. Las plantas tendrían que adaptarse a doble radiación y nosotros usaríamos bloqueador x2. Además habría 2 amaneceres y 2 atardeceres todos los días."},
   {p:"pudieras volar?",r:"El tráfico dejaría de existir. Llegarías al trabajo en 2 minutos volando por encima de los edificios. Pero también habría reglas aéreas, accidentes en el cielo y seguro tendrías que sacar licencia de vuelo. Dormirías en hamacas y los deportes serían todos aéreos."},
@@ -254,10 +255,18 @@ const esc = [
   {p:"no existiera el internet?",r:"Tendríamos que salir a la calle a hablar con la gente. Las enciclopedias volverían y las bibliotecas estarían llenas. Para ver a tus amigos tendrías que ir a su casa. Los juegos serían de mesa y las noticias llegarían por diario. Sería aburrido pero dormiríamos mejor."},
   {p:"pudieras respirar bajo el agua?",r:"Las vacaciones serían en el fondo del mar. Tendríamos casas submarinas y los delfines serían nuestros vecinos. El fútbol se jugaría en 3D bajo el agua. Pero también tendríamos que lidiar con tiburones y la presión. Atlantis sería real."}
 ];
-function generarEscenario(){
-  let r=esc[Math.floor(Math.random()*esc.length)];
-  document.getElementById('escenario').innerText="¿Qué pasaría si "+r.p;
-  document.getElementById('respuesta').innerText=r.r;
+
+function cargarEscenarios(){
+  let html = '';
+  esc.forEach((e, i)=>{
+    html += `<button class="esc-btn" onclick="mostrarEscenario(${i})">¿Qué pasaría si ${e.p}</button>`;
+  });
+  document.getElementById('listaEscenarios').innerHTML = html;
+}
+
+function mostrarEscenario(i){
+  document.getElementById('escenario').innerText = "¿Qué pasaría si " + esc[i].p;
+  document.getElementById('respuesta').innerText = esc[i].r;
 }
 
 // EXP 4
