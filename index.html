@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LGC.FUN v1.5.2</title>
+<title>LGC.FUN v1.4</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
 body{background:#000;color:#fff;overflow-x:hidden}
@@ -61,22 +61,21 @@ h2{font-size:35px;margin-bottom:20px;color:#00f7ff}
 <div class="container">
   <div id="menu" class="card active">
     <h2>Bienvenido a LGC.FUN</h2>
-    <p>Versión 1.5.2 - "Maestro"</p>
+    <p>Versión 1.4</p>
   </div>
 
   <div id="novedades" class="card">
     <h2>📢 Novedades</h2>
-    <div class="version">Novedades V1.5</div>
-    <div class="novedad">⚡ Animaciones y transiciones</div>
-    <div class="novedad">🛡️ Exp 5: 4 pasos con barra de progreso</div>
-    <div class="novedad">🌀 Exp 3: 25 escenarios totales</div>
-    <div class="novedad">🏆 23 logros totales</div>
+    <div class="version">Novedades V1.4</div>
+    <div class="novedad">🛡️ Exp 5: La Contraseña Perfecta</div>
+    <div class="novedad">🌀 Exp 3: +5 escenarios nuevos. Total 20</div>
+    <div class="novedad">🏆 +6 Logros nuevos. Total 18 logros</div>
+    <div class="novedad">⭕ Nuevo: Compás Divino - 99% en círculo</div>
   </div>
 
   <div id="periodico" class="card">
     <h2>📰 Periódico LGC</h2>
-    <div class="novedad"><h4>V1.5 - "Maestro"</h4><p>- Animaciones<br>- Exp 5 mejorado<br>- 25 escenarios<br>- 23 logros</p></div>
-    <div class="novedad"><h4>V1.4 - "La Contraseña"</h4><p>- Exp 5 agregado</p></div>
+    <div class="novedad"><h4>V1.4 - "La Contraseña"</h4><p>- Exp 5: La Contraseña Perfecta<br>- 20 escenarios<br>- 18 logros</p></div>
     <div class="novedad"><h4>V1.3 - "Expansión Cósmica"</h4><p>- Exp 4: Gravedad</p></div>
     <div class="novedad"><h4>V1.2 - "El Círculo"</h4><p>- Exp 3 y 2</p></div>
     <div class="novedad"><h4>V1.1 - "Primer Click"</h4><p>- Exp 1</p></div>
@@ -143,7 +142,7 @@ h2{font-size:35px;margin-bottom:20px;color:#00f7ff}
     <p>Mejor Salto: <b id="mejorSalto">0</b>m</p>
     <p>Mejor Pass: <b id="mejorPass">0</b>%</p>
     <div class="divider"></div>
-    <h3>Logros: <b id="logrosCount">0</b>/23</h3>
+    <h3>Logros: <b id="logrosCount">0</b>/18</h3>
     <div id="logrosList"></div>
   </div>
 
@@ -158,7 +157,6 @@ h2{font-size:35px;margin-bottom:20px;color:#00f7ff}
 </div>
 
 <script>
-// ========== VARIABLES GLOBALES ==========
 let currentUser = localStorage.getItem('lgc_user') || 'anonimo';
 let data = JSON.parse(localStorage.getItem('lgc_data_' + currentUser)) || {bestCPS:0, bestCircle:0, escenarios:0, mejorSalto:0, mejorPass:0, logros:[]};
 let expsUsadas = [];
@@ -166,7 +164,6 @@ let clicks = 0, playing = false, gameTime = 5, timerInterval;
 let drawing = false, points = [], startPoint = null;
 let gravity = 9;
 
-// ========== ESTRELLAS ==========
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -175,12 +172,11 @@ for(let i=0; i<100; i++){ stars.push({x: Math.random()*canvas.width, y: Math.ran
 function drawStars(){ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "white"; stars.forEach(s=>{ ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28); ctx.fill(); s.y += s.d; if(s.y > canvas.height){ s.y = 0; s.x = Math.random()*canvas.width; }}); requestAnimationFrame(drawStars); }
 drawStars();
 
-// ========== NAVEGACION ==========
 function show(id){
   document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(id=='perfil') updatePerfil();
-  if(id=='lab') setTimeout(generarRequisitos, 200);
+  if(id=='lab') generarRequisitos();
 }
 function showExp(n){
   if(!expsUsadas.includes(n)) expsUsadas.push(n);
@@ -188,20 +184,17 @@ function showExp(n){
   document.getElementById('exp'+n).classList.add('active');
 }
 
-// ========== EXP 1 CLICK ==========
 document.getElementById('gameArea').onclick = function(){ if(!playing) startGame(); else count(); }
 function setTime(t){ gameTime = t; document.getElementById('timer').innerText = 'Tiempo: ' + t + 's'; document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); }
 function startGame(){ clicks = 0; let timeLeft = gameTime; playing = true; document.getElementById('score').innerText = 'Puntaje: 0'; document.getElementById('gameArea').innerText = '¡CLICK!'; timerInterval = setInterval(function(){ timeLeft--; document.getElementById('timer').innerText = 'Tiempo: ' + timeLeft + 's'; if(timeLeft <= 0){ clearInterval(timerInterval); playing = false; document.getElementById('gameArea').innerText = 'Click para empezar'; let cps = clicks/gameTime; alert('CPS: ' + cps.toFixed(2)); if(cps > data.bestCPS){ data.bestCPS = cps; checkLogros(); saveData(); }}},1000); }
 function count(){ if(playing){ clicks++; document.getElementById('score').innerText = 'Puntaje: ' + clicks; }}
 
-// ========== EXP 2 CIRCULO ==========
 const drawCanvas = document.getElementById('canvasDraw'); const dctx = drawCanvas.getContext('2d');
 drawCanvas.onmousedown = function(e){ drawing=true; points=[]; const rect=drawCanvas.getBoundingClientRect(); startPoint={x:e.clientX-rect.left,y:e.clientY-rect.top}; points.push(startPoint); clearCanvas(); }
 drawCanvas.onmousemove = function(e){ if(!drawing)return; const rect=drawCanvas.getBoundingClientRect(); const pos={x:e.clientX-rect.left,y:e.clientY-rect.top}; points.push(pos); dctx.strokeStyle='#00f7ff'; dctx.lineWidth=5; dctx.beginPath(); dctx.moveTo(points[points.length-2].x,points[points.length-2].y); dctx.lineTo(pos.x,pos.y); dctx.stroke(); }
 drawCanvas.onmouseup = function(){ drawing=false; if(points.length<30){document.getElementById('circleScore').innerText='DIBUJA MAS';return;} let score = 70 + Math.random()*30; document.getElementById('circleScore').innerText='Precisión: '+score.toFixed(1)+'%'; if(score>data.bestCircle){data.bestCircle=score; checkLogros(); saveData();}}
 function clearCanvas(){ dctx.clearRect(0,0,550,280); document.getElementById('circleScore').innerText='Precisión: -'; }
 
-// ========== EXP 3 - 25 ESCENARIOS ==========
 const escenarios = [
 {p:"los gatos dominaran el mundo?",r:"Siestas obligatorias."},{p:"hubieran 2 soles?",r:"Doble calor."},{p:"pudieras respirar bajo el agua?",r:"Vecinos delfines."},
 {p:"el tiempo fuera dinero?",r:"Dormir caro."},{p:"pudieras teletransportarte?",r:"Llegarías tarde."},{p:"la gravedad fuera la mitad?",r:"Saltar edificios."},
@@ -209,31 +202,26 @@ const escenarios = [
 {p:"duraras 1 semana despierto?",r:"Zombie día 7."},{p:"la escuela fuera opcional?",r:"Todos jugando."},{p:"pudieras clonar amigos?",r:"Fiesta x5."},
 {p:"los emojis cobraran vida?",r:"El de caca te persigue."},{p:"pudieras volar?",r:"2 min al trabajo."},{p:"fuera sábado siempre?",r:"Perder noción."},
 {p:"pudieras leer la mente?",r:"Todos piensan en comida."},{p:"llovieran hamburguesas?",r:"Mejor problema."},{p:"los autos volaran?",r:"Trafico en el cielo."},
-{p:"tuvieras 3 brazos?",r:"Hacer todo."},{p:"el wifi fuera gratis?",r:"Paz mundial."},
-{p:"pudieras detener el tiempo?",r:"Llegar tarde con excusa."},{p:"los perros hablaran?",r:"Se quejarían."},{p:"existieran 10 lunas?",r:"Noche de día."},
-{p:"pudieras comer sin engordar?",r:"Paraíso."},{p:"todos fueran invisibles?",r:"Caos en filas."}
+{p:"tuvieras 3 brazos?",r:"Hacer todo."},{p:"el wifi fuera gratis?",r:"Paz mundial."}
 ];
 function generarEscenario(){ const random=escenarios[Math.floor(Math.random()*escenarios.length)]; document.getElementById('escenario').innerText="¿Qué pasaría si "+random.p; document.getElementById('respuesta').innerText="Respuesta: "+random.r; data.escenarios++; checkLogros(); saveData(); }
 
-// ========== EXP 4 GRAVEDAD ==========
 function updateGravity(val){gravity=val; document.getElementById('gravityValue').innerText=val;}
 function lanzarPelota(){ let ball=document.getElementById('ball'); let gravArea=document.getElementById('gravedadArea'); let ballY=20; let velocity=-15; function animate(){ velocity+=gravity*0.2; ballY+=velocity; if(ballY>gravArea.offsetHeight-45){ballY=gravArea.offsetHeight-45; velocity=0;} ball.style.top=ballY+'px'; let altura=((gravArea.offsetHeight-ballY)/10).toFixed(1); if(altura>data.mejorSalto){data.mejorSalto=altura; checkLogros(); saveData();} if(velocity!=0)requestAnimationFrame(animate);} animate(); }
 
-// ========== EXP 5 CONTRASEÑA ==========
 function generarRequisitos(){ const reqs=["Mínimo 8 caracteres","1 mayúscula","1 número","1 símbolo"]; let reqsActuales=[]; for(let i=0;i<4;i++){let r=reqs[Math.floor(Math.random()*reqs.length)]; if(!reqsActuales.includes(r))reqsActuales.push(r);} document.getElementById('requisitos').innerHTML="Requisitos:<br>- "+reqsActuales.join("<br>- "); window.reqsActuales=reqsActuales; }
 function checkPasswordLive(){ let pass=document.getElementById('passInput').value; let score=0; if(pass.length>=8)score+=25; if(/[A-Z]/.test(pass))score+=25; if(/[0-9]/.test(pass))score+=25; if(/[!@#$%]/.test(pass))score+=25; document.getElementById('passScore').innerText="Seguridad: "+score+"%"; document.getElementById('progressBar').style.width=score+"%"; }
 function checkPassword(){ checkPasswordLive(); let score=parseInt(document.getElementById('passScore').innerText.match(/\d+/)[0]); if(score>data.mejorPass){data.mejorPass=score; checkLogros(); saveData();} alert(score==100?"¡100%!":"Sigue intentando"); }
 
-// ========== LOGROS - 23 ==========
 const logrosData = [
-{id:'cps_5',titulo:'Dedos Rápidos',desc:'5 CPS'},{id:'cps_9',titulo:'Ametralladora',desc:'9 CPS'},{id:'cps_15',titulo:'Flash',desc:'15 CPS'},
+{id:'cps_5',titulo:'Dedos Rápidos',desc:'5 CPS'},{id:'cps_9',titulo:'Ametralladora',desc:'9 CPS'},
 {id:'circle_80',titulo:'Artista',desc:'80%'},{id:'circle_99',titulo:'Compás Divino',desc:'99%'},
-{id:'esc_10',titulo:'Multiverso',desc:'10'},{id:'esc_20',titulo:'Teórico',desc:'20'},{id:'esc_25',titulo:'Maestro del Caos',desc:'25'},
-{id:'salto_15',titulo:'Cohete',desc:'15m'},{id:'salto_25',titulo:'Astronauta',desc:'25m'},{id:'salto_40',titulo:'Gravedad Cero',desc:'40m'},
-{id:'pass_100',titulo:'Hacker',desc:'100%'},{id:'todo_80',titulo:'Leyenda',desc:'80% + 9 CPS'},{id:'coleccionista',titulo:'Coleccionista',desc:'18 logros'},
-{id:'noctambulo',titulo:'Noctámbulo',desc:'00-6hs'},{id:'perfecto',titulo:'Perfeccionista',desc:'100% x2'},{id:'adicto',titulo:'Adicto',desc:'5 exp'}
+{id:'esc_10',titulo:'Multiverso',desc:'10'},{id:'esc_20',titulo:'Teórico',desc:'20'},
+{id:'salto_15',titulo:'Cohete',desc:'15m'},{id:'salto_25',titulo:'Astronauta',desc:'25m'},
+{id:'pass_100',titulo:'Hacker',desc:'100%'},{id:'todo_80',titulo:'Leyenda',desc:'80% + 9 CPS'},{id:'coleccionista',titulo:'Coleccionista',desc:'15 logros'},
+{id:'noctambulo',titulo:'Noctámbulo',desc:'00-6hs'}
 ];
-function checkLogros(){ logrosData.forEach(l=>{ let u=false; if(l.id=='cps_5'&&data.bestCPS>=5)u=true; if(l.id=='cps_9'&&data.bestCPS>=9)u=true; if(l.id=='cps_15'&&data.bestCPS>=15)u=true; if(l.id=='circle_80'&&data.bestCircle>=80)u=true; if(l.id=='circle_99'&&data.bestCircle>=99)u=true; if(l.id=='esc_10'&&data.escenarios>=10)u=true; if(l.id=='esc_20'&&data.escenarios>=20)u=true; if(l.id=='esc_25'&&data.escenarios>=25)u=true; if(l.id=='salto_15'&&data.mejorSalto>=15)u=true; if(l.id=='salto_25'&&data.mejorSalto>=25)u=true; if(l.id=='salto_40'&&data.mejorSalto>=40)u=true; if(l.id=='pass_100'&&data.mejorPass>=100)u=true; if(l.id=='todo_80'&&data.bestCircle>=80&&data.bestCPS>=9)u=true; if(l.id=='coleccionista'&&data.logros.length>=18)u=true; if(l.id=='noctambulo'&&new Date().getHours()<6)u=true; if(l.id=='perfecto'&&data.bestCircle>=99&&data.mejorPass>=100)u=true; if(l.id=='adicto'&&expsUsadas.length>=5)u=true; if(u&&!data.logros.includes(l.id)){data.logros.push(l.id); alert('🏆 '+l.titulo);}}); }
+function checkLogros(){ logrosData.forEach(l=>{ let u=false; if(l.id=='cps_5'&&data.bestCPS>=5)u=true; if(l.id=='cps_9'&&data.bestCPS>=9)u=true; if(l.id=='circle_80'&&data.bestCircle>=80)u=true; if(l.id=='circle_99'&&data.bestCircle>=99)u=true; if(l.id=='esc_10'&&data.escenarios>=10)u=true; if(l.id=='esc_20'&&data.escenarios>=20)u=true; if(l.id=='salto_15'&&data.mejorSalto>=15)u=true; if(l.id=='salto_25'&&data.mejorSalto>=25)u=true; if(l.id=='pass_100'&&data.mejorPass>=100)u=true; if(l.id=='todo_80'&&data.bestCircle>=80&&data.bestCPS>=9)u=true; if(l.id=='coleccionista'&&data.logros.length>=15)u=true; if(l.id=='noctambulo'&&new Date().getHours()<6)u=true; if(u&&!data.logros.includes(l.id)){data.logros.push(l.id); alert('🏆 '+l.titulo);}}); }
 function updatePerfil(){ document.getElementById('bestCPS').innerText=data.bestCPS.toFixed(2); document.getElementById('bestCircle').innerText=data.bestCircle.toFixed(1); document.getElementById('escenariosVistos').innerText=data.escenarios; document.getElementById('mejorSalto').innerText=data.mejorSalto; document.getElementById('mejorPass').innerText=data.mejorPass; document.getElementById('logrosCount').innerText=data.logros.length; let html=''; logrosData.forEach(l=>{ let unlocked=data.logros.includes(l.id); html+=`<div class="logro ${unlocked?'unlocked':''}"><div class="titulo">${unlocked?'🏆 ':''}${l.titulo}</div><div style="font-size:15px; color:#aaa">${l.desc}</div></div>`;}); document.getElementById('logrosList').innerHTML=html; }
 
 function login(){ const u=document.getElementById('user').value; const p=document.getElementById('pass').value; if(u&&p==='lgc2025'){currentUser=u; localStorage.setItem('lgc_user',u); data=JSON.parse(localStorage.getItem('lgc_data_'+u))||{bestCPS:0,bestCircle:0,escenarios:0,mejorSalto:0,mejorPass:0,logros:[]}; document.getElementById('msg').innerText='Bienvenido '+u; updatePerfil();}else{document.getElementById('msg').innerText='Pass: lgc2025';}}
@@ -243,4 +231,4 @@ function saveData(){ localStorage.setItem('lgc_data_'+currentUser,JSON.stringify
 updatePerfil();
 </script>
 </body>
-   </html>
+  </html>
