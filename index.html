@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LGC.FUN v1.3.8</title>
+<title>LGC.FUN v1.3.9</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
   body { background: #000; color: #fff; overflow-x: hidden; overflow-y: auto; height: 100vh; user-select: none; }
@@ -23,8 +23,8 @@
 .time-btn:focus { outline: none; }
 .esc-btn { background: #111; border: 1px solid #444; color: #fff; padding: 12px; margin: 6px; border-radius: 8px; cursor: pointer; width: 100%; text-align: left; font-size: 15px; transition: 0.2s; }
 .esc-btn:hover { border-color: #00f7ff; background: rgba(0,247,255,0.05); }
-  #gameArea { width: 100%; height: 200px; background: rgba(0,247,255,0.05); border: 2px dashed #00f7ff; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: 15px; cursor: pointer; touch-action: none; user-select: none; }
-  #gameArea:active { background: rgba(0,247,255,0.1); }
+  #gameArea { width: 100%; height: 200px; background: rgba(0,247,255,0.05); border: 2px dashed #00f7ff; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: 15px; cursor: pointer; touch-action: manipulation; user-select: none; }
+  #gameArea:active { background: rgba(0,247,255,0.2); transform: scale(0.98); }
   #canvasDraw { background: #111; border: 2px solid #00f7ff; border-radius: 12px; width: 100%; max-width: 400px; height: 200px; touch-action: none; }
   input { padding: 10px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; margin: 5px; width: 80%; }
 .logro { background: #111; border: 1px solid #444; padding: 12px; margin: 8px 0; border-radius: 8px; text-align: left; }
@@ -61,21 +61,24 @@
 <div class="container">
   <div id="menu" class="card active">
     <h2>Bienvenido a LGC.FUN</h2>
-    <p>Versión 1.3.8</p>
+    <p>Versión 1.3.9 - Clicks Turbo</p>
   </div>
 
   <div id="novedades" class="card">
     <h2>📢 Novedades</h2>
-    <div class="version">Novedades V1.3.8</div>
-    <div class="novedad">📋 Escenarios ahora tienen botones para elegir</div>
-    <div class="novedad">🖱️ Fix: Ya no se pone azul al clickear CPS</div>
+    <div class="version">Novedades V1.3.9</div>
+    <div class="novedad">⚡ CPS Turbo: Ahora puedes clickear mucho más rápido</div>
+    <div class="novedad">📋 +4 Escenarios nuevos en ¿Qué pasaría si?</div>
+    <div class="novedad">🏆 Sistema de 7 Logros completos</div>
   </div>
 
   <div id="periodico" class="card">
     <h2>📰 Periódico LGC</h2>
     <div class="historial">
-      <h4>V1.3.8</h4>
-      <p>- Exp 3: Lista de escenarios clickeables</p>
+      <h4>V1.3.9</h4>
+      <p>- CPS optimizado para 100+ clicks</p>
+      <p>- 9 Escenarios totales</p>
+      <p>- 7 Logros agregados</p>
     </div>
   </div>
 
@@ -156,7 +159,7 @@ function show(id){
   document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(id=='perfil') updatePerfil();
-  if(id=='lab' && document.getElementById('exp3').style.display=='block') cargarEscenarios(); // carga botones
+  if(id=='lab' && document.getElementById('exp3').style.display=='block') cargarEscenarios();
 }
 function showExp(n){
   document.getElementById('exp1').style.display = n==1?'block':'none';
@@ -166,9 +169,18 @@ function showExp(n){
   if(n==3) cargarEscenarios();
 }
 
-// EXP 1: CLICK
+// EXP 1: CLICK TURBO
 let clicks=0, playing=false, time=5;
-document.getElementById('gameArea').onclick = (e)=>{ e.preventDefault(); if(!playing) start(); else {clicks++; document.getElementById('score').innerText='Puntaje: '+clicks;} }
+const gameArea = document.getElementById('gameArea');
+
+gameArea.addEventListener('touchstart', (e)=>{e.preventDefault(); count();});
+gameArea.addEventListener('mousedown', (e)=>{e.preventDefault(); count();});
+
+function count(){
+  if(!playing) start();
+  else {clicks++; document.getElementById('score').innerText='Puntaje: '+clicks;}
+}
+
 function setTime(t, e){
   time=t;
   document.getElementById('timer').innerText='Tiempo: '+t+'s';
@@ -247,13 +259,17 @@ function clearCanvas(){
     document.getElementById('circleScore').innerText = 'Precisión: -';
 }
 
-// EXP 3: BOTONES DE ESCENARIOS
+// EXP 3: 9 ESCENARIOS
 const esc = [
   {p:"hubieran 2 soles?",r:"Tendríamos días de 48 horas de luz seguidos y noches eternas. El clima sería un caos: desiertos hirviendo y zonas congeladas. Las plantas tendrían que adaptarse a doble radiación y nosotros usaríamos bloqueador x2. Además habría 2 amaneceres y 2 atardeceres todos los días."},
   {p:"pudieras volar?",r:"El tráfico dejaría de existir. Llegarías al trabajo en 2 minutos volando por encima de los edificios. Pero también habría reglas aéreas, accidentes en el cielo y seguro tendrías que sacar licencia de vuelo. Dormirías en hamacas y los deportes serían todos aéreos."},
   {p:"los gatos dominaran el mundo?",r:"Habría siesta obligatoria cada 2 horas y el atún sería la moneda oficial. Trabajaríamos 4 horas y dormiríamos 20. Todos los muebles tendrían rascadores y las leyes las decidirían los gatos tirando cosas al piso. Netflix solo tendría videos de aves."},
   {p:"no existiera el internet?",r:"Tendríamos que salir a la calle a hablar con la gente. Las enciclopedias volverían y las bibliotecas estarían llenas. Para ver a tus amigos tendrías que ir a su casa. Los juegos serían de mesa y las noticias llegarían por diario. Sería aburrido pero dormiríamos mejor."},
-  {p:"pudieras respirar bajo el agua?",r:"Las vacaciones serían en el fondo del mar. Tendríamos casas submarinas y los delfines serían nuestros vecinos. El fútbol se jugaría en 3D bajo el agua. Pero también tendríamos que lidiar con tiburones y la presión. Atlantis sería real."}
+  {p:"pudieras respirar bajo el agua?",r:"Las vacaciones serían en el fondo del mar. Tendríamos casas submarinas y los delfines serían nuestros vecinos. El fútbol se jugaría en 3D bajo el agua. Pero también tendríamos que lidiar con tiburones y la presión. Atlantis sería real."},
+  {p:"el tiempo fuera dinero?",r:"Cada segundo que duermes te cuesta. Procrastinar te dejaría en bancarrota. Los ricos serían los que menos duermen y los emprendedores venderían 'horas'. Trabajarías 24/7 para no quedarte sin tiempo. Morir joven sería lo más rentable."},
+  {p:"pudieras teletransportarte?",r:"Llegarías tarde igual porque dirías 'ya voy' 5 minutos antes. No habría aeropuertos, ni tráfico, ni Uber. Pero la gente se metería a tu casa sin tocar. Tendrías que poner contraseña a tu teletransportador. Las vacaciones serían de 5 minutos."},
+  {p:"los dinosaurios nunca se extinguieron?",r:"Manejar sería imposible. Un T-Rex no entra en el garage y un Braquiosaurio se comería los semáforos. La carne sería barata pero ir al parque sería un deporte extremo. Probablemente tendríamos dinosaurios de mascota del tamaño de un perro."},
+  {p:"todos tuvieran superpoderes?",r:"El caos total. Nadie respetaría las filas porque alguien podría atravesar paredes. Los bancos durarían 2 minutos. Pero estaría buenísimo: volar al trabajo, leer mentes en exámenes y curarte de cualquier cosa. Las guerras serían épicas."}
 ];
 
 function cargarEscenarios(){
@@ -274,14 +290,26 @@ let gravity = 9;
 function updateGravity(val){ gravity = val; document.getElementById('gravityValue').innerText = val; }
 function lanzarPelota(){ let ball=document.getElementById('ball'); ball.style.top='20px'; let y=20,v=-15; function anim(){v+=gravity*0.2;y+=v; if(y>220)y=220; ball.style.top=y+'px'; if(v<10)requestAnimationFrame(anim);} anim(); }
 
-// LOGROS
+// 7 LOGROS
 const logrosData = [
   {id:'cps_5', titulo:'Dedos Rápidos', desc:'Llega a 5 CPS'},
-  {id:'circle_80', titulo:'Artista', desc:'80% de precisión'}
+  {id:'cps_10', titulo:'Ametralladora', desc:'Llega a 10 CPS'},
+  {id:'cps_20', titulo:'Flash', desc:'Llega a 20 CPS'},
+  {id:'circle_80', titulo:'Artista', desc:'80% de precisión en círculo'},
+  {id:'circle_95', titulo:'Compás Humano', desc:'95% de precisión en círculo'},
+  {id:'esc_3', titulo:'Curioso', desc:'Mira 3 escenarios diferentes'},
+  {id:'todo', titulo:'Leyenda LGC', desc:'10 CPS + 80% círculo'}
 ];
+let escenariosVistos = new Set();
+
 function checkLogros(){
   if(data.bestCPS>=5 &&!data.logros.includes('cps_5')){data.logros.push('cps_5'); alert('🏆 Logro: Dedos Rápidos')}
+  if(data.bestCPS>=10 &&!data.logros.includes('cps_10')){data.logros.push('cps_10'); alert('🏆 Logro: Ametralladora')}
+  if(data.bestCPS>=20 &&!data.logros.includes('cps_20')){data.logros.push('cps_20'); alert('🏆 Logro: Flash')}
   if(data.bestCircle>=80 &&!data.logros.includes('circle_80')){data.logros.push('circle_80'); alert('🏆 Logro: Artista')}
+  if(data.bestCircle>=95 &&!data.logros.includes('circle_95')){data.logros.push('circle_95'); alert('🏆 Logro: Compás Humano')}
+  if(escenariosVistos.size>=3 &&!data.logros.includes('esc_3')){data.logros.push('esc_3'); alert('🏆 Logro: Curioso')}
+  if(data.bestCPS>=10 && data.bestCircle>=80 &&!data.logros.includes('todo')){data.logros.push('todo'); alert('🏆 Logro: Leyenda LGC')}
 }
 function updatePerfil(){
   document.getElementById('bestCPS').innerText = data.bestCPS.toFixed(2);
@@ -297,6 +325,15 @@ function updatePerfil(){
 // LOGIN
 function login(){ if(document.getElementById('pass').value=='lgc2025') alert('Bienvenido'); else alert('Pass: lgc2025'); }
 function saveData(){localStorage.setItem('lgc_data', JSON.stringify(data))}
+
+// Contar escenarios vistos
+const oldMostrar = mostrarEscenario;
+mostrarEscenario = function(i){
+  escenariosVistos.add(i);
+  oldMostrar(i);
+  checkLogros();
+  saveData();
+}
 </script>
 </body>
-         </html>
+   </html>
