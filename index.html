@@ -2,21 +2,75 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>LGC.FUN v3.2.3</title>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-  body { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; min-height: 100vh; padding: 10px; }
-  .container { max-width: 800px; margin: 0 auto; }
-  h1 { text-align: center; margin: 20px 0; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-  .stats { display: flex; justify-content: space-around; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { 
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
+    color: #fff; 
+    font-family: 'Arial Black', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 10px; }
+  
+  h1 { 
+    text-align: center; 
+    font-size: 2.8em; 
+    background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+    margin: 15px 0;
+    text-shadow: 0 0 20px rgba(255,0,255,0.5);
+  }
+  @keyframes shine { to { background-position: 200%; } }
+  
+  .stats { 
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; 
+    border: 2px solid #00ffff; margin-bottom: 20px;
+  }
   .stat { text-align: center; }
-  .stat-num { font-size: 1.8em; font-weight: bold; color: #ffd700; }
-  .click-btn { width: 200px; height: 200px; margin: 20px auto; background: radial-gradient(circle, #ff6b6b, #c0392b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2em; font-weight: bold; cursor: pointer; user-select: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.1s; }
-  .click-btn:active { transform: scale(0.9); }
-  .achievements { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; max-height: 400px; overflow-y: auto; }
-  .achievement { background: rgba(255,255,255,0.1); padding: 10px; margin: 8px 0; border-radius: 10px; border-left: 4px solid #ffd700; }
-  .achievement.locked { opacity: 0.4; border-left-color: #666; }
+  .stat-num { font-size: 2em; color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+  
+  .game-area { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  
+  .click-btn { 
+    width: 220px; height: 220px; 
+    background: radial-gradient(circle at 30% 30%, #ff0080, #8000ff, #0040ff);
+    border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 2.2em; cursor: pointer; user-select: none; 
+    box-shadow: 0 0 40px rgba(255,0,128,0.6);
+    border: 4px solid #fff;
+    transition: all 0.1s;
+    position: relative;
+  }
+  .click-btn:active { transform: scale(0.88); box-shadow: 0 0 80px rgba(255,0,128,1); }
+  
+  .dibujo { 
+    width: 90%; max-width: 400px; height: 200px;
+    background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff);
+    border-radius: 20px; border: 3px solid #00ffff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5em; box-shadow: 0 0 30px rgba(58,134,255,0.5);
+  }
+  
+  .achievements { 
+    background: rgba(0,0,0,0.5); padding: 15px; border-radius: 20px; 
+    border: 2px solid #ff00ff; max-height: 400px; overflow-y: auto;
+  }
+  .achievement { 
+    background: rgba(255,255,255,0.08); padding: 12px; margin: 8px 0; 
+    border-radius: 12px; border-left: 5px solid #666; 
+    display: flex; align-items: center; gap: 10px;
+    transition: all 0.3s;
+  }
+  .achievement.unlocked { border-left-color: #00ff88; background: rgba(0,255,136,0.1); }
+  .achievement .icon { font-size: 1.8em; }
 </style>
 </head>
 <body>
@@ -24,70 +78,78 @@
   <h1>🔥 LGC.FUN v3.2.3 🔥</h1>
   
   <div class="stats">
-    <div class="stat">
-      <div class="stat-num" id="clicks">0</div>
-      <div>Clicks</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="achieved">0/300</div>
-      <div>Logros</div>
-    </div>
+    <div class="stat"><div class="stat-num" id="clicks">0</div><div>CLICKS</div></div>
+    <div class="stat"><div class="stat-num" id="logros">0/300</div><div>LOGROS</div></div>
+    <div class="stat"><div class="stat-num" id="cps">0</div><div>CPS</div></div>
   </div>
 
-  <div class="click-btn" id="clickBtn">CLICK!</div>
-
-  <div class="achievements" id="achievementsList">
-    <!-- Los 300 logros se generan con JS -->
+  <div class="game-area">
+    <div class="dibujo">✨ TU DIBUJO ÉPICO AQUÍ ✨</div>
+    <div class="click-btn" id="btn">CLICK!</div>
   </div>
+
+  <div class="achievements" id="listaLogros"></div>
 </div>
 
 <script>
-let clicks = parseInt(localStorage.getItem('lgc_clicks')) || 0;
-let unlocked = JSON.parse(localStorage.getItem('lgc_unlocked')) || [];
+let data = JSON.parse(localStorage.getItem('LGC_SAVE_v323')) || {clicks: 0, logros: [], lastClick: Date.now()};
+let lastCPS = 0;
 
-const achievements = Array.from({length: 300}, (_, i) => ({
-  id: i+1,
-  name: `Logro #${i+1}`,
-  desc: `Consigue ${i+1} clicks`,
-  req: i+1
-}));
-
-function save() {
-  localStorage.setItem('lgc_clicks', clicks);
-  localStorage.setItem('lgc_unlocked', JSON.stringify(unlocked));
+// LOS 300 LOGROS REALES
+const LOGROS = [];
+const nombres = ["Primeros Pasos","Calentando","Adicto","No paras","Dedo de acero","Rey del Click","Máquina","Cyborg","Leyenda","DIOS"];
+for(let i=1; i<=300; i++){
+  LOGROS.push({
+    id: i,
+    nombre: i <= 10 ? nombres[i-1] : `Logro Épico #${i}`,
+    desc: `Alcanza ${i*100} clicks`,
+    req: i*100,
+    icon: i % 10 === 0 ? '👑' : i % 5 === 0 ? '💎' : '🏆'
+  });
 }
 
-function checkAchievements() {
-  achievements.forEach(a => {
-    if(clicks >= a.req && !unlocked.includes(a.id)) {
-      unlocked.push(a.id);
-      alert(`🏆 ¡Desbloqueado! ${a.name}`);
+function guardar() {
+  localStorage.setItem('LGC_SAVE_v323', JSON.stringify(data));
+}
+
+function revisarLogros() {
+  LOGROS.forEach(l => {
+    if(data.clicks >= l.req && !data.logros.includes(l.id)){
+      data.logros.push(l.id);
+      alert(`🏆 ¡LOGRO DESBLOQUEADO!\n${l.icon} ${l.nombre}\n${l.desc}`);
     }
   });
-  save();
-  render();
 }
 
 function render() {
-  document.getElementById('clicks').innerText = clicks;
-  document.getElementById('achieved').innerText = `${unlocked.length}/300`;
+  document.getElementById('clicks').innerText = data.clicks.toLocaleString();
+  document.getElementById('logros').innerText = `${data.logros.length}/300`;
   
-  const list = document.getElementById('achievementsList');
-  list.innerHTML = '';
-  achievements.forEach(a => {
+  let ahora = Date.now();
+  let cps = Math.floor((data.clicks - lastCPS) / ((ahora - data.lastClick)/1000));
+  document.getElementById('cps').innerText = cps > 0 ? cps : 0;
+  data.lastClick = ahora;
+  lastCPS = data.clicks;
+  
+  const lista = document.getElementById('listaLogros');
+  lista.innerHTML = '';
+  LOGROS.forEach(l => {
     const div = document.createElement('div');
-    div.className = 'achievement ' + (unlocked.includes(a.id) ? '' : 'locked');
-    div.innerHTML = `<b>${a.name}</b><br>${a.desc}`;
-    list.appendChild(div);
+    div.className = 'achievement ' + (data.logros.includes(l.id) ? 'unlocked' : '');
+    div.innerHTML = `<span class="icon">${l.icon}</span><div><b>${l.nombre}</b><br><small>${l.desc}</small></div>`;
+    lista.appendChild(div);
   });
+  guardar();
 }
 
-document.getElementById('clickBtn').onclick = () => {
-  clicks++;
-  checkAchievements();
+document.getElementById('btn').onclick = () => {
+  data.clicks++;
+  revisarLogros();
+  render();
 };
 
 render();
+setInterval(render, 1000);
 </script>
 </body>
 </html>
