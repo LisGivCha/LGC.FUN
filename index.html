@@ -22,7 +22,7 @@ button.active{background:linear-gradient(135deg,#ff00ff,#cc00cc)}
 #panelLogros.open{right:0}
 #btnLogros{position:fixed;top:20px;right:20px;z-index:101;background:linear-gradient(135deg,#ffd700,#ffaa00)}
 #stats{position:fixed;top:20px;left:20px;z-index:101;background:rgba(0,0,0,0.5);padding:10px 20px;border-radius:20px;font-weight:600}
-#modalReset,#modalEliminar{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:200}
+#modalReset{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:200}
 #modalBox{background:rgba(20,20,30,0.95);padding:30px;border-radius:20px;border:2px solid #ff0044;max-width:500px;text-align:center}
 .btn-si{background:linear-gradient(135deg,#ff0044,#cc0033)}
 .btn-no{background:linear-gradient(135deg,#666,#444)}
@@ -81,8 +81,8 @@ select{padding:10px;border-radius:10px;background:#1a1a2e;color:#fff;border:1px 
 
 <script>
 // SISTEMA BASE
-let logros=JSON.parse(localStorage.getItem('lgc_logros')||'[]'),clicks=0,mejorCPS=0,tab=Array(9).fill(''),dificultad='medio',dibujos=JSON.parse(localStorage.getItem('lgc_dibujos')||'[]'),dibujoAEliminar=null;
-let estrellas=[],cps=0,ultimoClick=0;
+let logros=JSON.parse(localStorage.getItem('lgc_logros')||'[]'),clicks=0,mejorCPS=0,tab=Array(9).fill(''),dificultad='medio';
+let estrellas=[];
 
 // 300 LOGROS CON NOMBRES
 const nombresLogros=["Primer Click","100 Clicks","1000 Clicks","Maestro CPS","Velocidad Luz","Dibujante Novato","Artista Digital","Picasso LGC","Círculo Perfecto 90%","Círculo Perfecto 100%","Ganar al TaTeTi","Ganar en Difícil","Invencible TaTeTi","Gravedad Activada","100 Gravedades","Leer Periódico","Leer 10 Noticias","Ver Novedades","Completista","Leyenda LGC"];
@@ -128,10 +128,9 @@ iniciarExp(exp);
 
 function iniciarExp(exp){
 if(exp=='tateti'){renderTab()}
-if(exp=='circulo'){let c=document.getElementById('circCanvas'),ctx=c.getContext('2d');ctx.lineWidth=3;ctx.strokeStyle='#00d4ff';let dibujando=false,puntos=[];
-c.onmousedown=e=>{dibujando=true;puntos=[];ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)};c.onmouseup=()=>{dibujando=false;if(puntos.length>50)desbloquearLogro(8)}
-c.onmousemove=e=>{if(dibujando){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();puntos.push([e.offsetX,e.offsetY])}}
-}
+if(exp=='circulo'){let c=document.getElementById('circCanvas'),ctx=c.getContext('2d');ctx.lineWidth=3;ctx.strokeStyle='#00d4ff';let dibujando=false;
+c.onmousedown=e=>{dibujando=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)};c.onmouseup=()=>dibujando=false;
+c.onmousemove=e=>{if(dibujando){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke()}}}
 if(exp=='dibujo'){let c=document.getElementById('dibCanvas'),ctx=c.getContext('2d');ctx.lineWidth=3;ctx.strokeStyle='#ff00ff';let dib=false;
 function pos(e){let r=c.getBoundingClientRect();return e.touches? [e.touches[0].clientX-r.left,e.touches[0].clientY-r.top] : [e.offsetX,e.offsetY]}
 c.onmousedown=e=>{dib=true;let p=pos(e);ctx.beginPath();ctx.moveTo(p[0],p[1])};c.onmouseup=()=>dib=false;
